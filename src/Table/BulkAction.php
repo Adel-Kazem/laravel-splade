@@ -50,7 +50,7 @@ class BulkAction
     /**
      * Generates a Signed URL to the bulk action URL.
      */
-    public function getUrl(): string
+    public function getUrl(array $extraParameters = []): string
     {
         /** @var Route */
         $route = app('router')->getRoutes()->getByAction(TableBulkActionController::class);
@@ -58,10 +58,20 @@ class BulkAction
         /** @var array */
         $currentQuery = app()->bound('request') ? request()->query() : [];
 
-        return URL::signedRoute($route->getName(), array_merge($currentQuery, [
+        $parameters = array_merge($currentQuery, [
             'table'  => base64_encode($this->tableClass),
             'action' => base64_encode($this->key),
             'slug'   => $this->getSlug(),
-        ]));
+            'bexParameters'   => $extraParameters['wildId'],
+        ]); // Merge extra parameters into the URL parameters
+
+        return URL::signedRoute($route->getName(), $parameters);
     }
+
+    // In BulkAction.php
+    public function setExtraParameters($extraParameters)
+    {
+        $this->extraParameters = $extraParameters;
+    }
+
 }
