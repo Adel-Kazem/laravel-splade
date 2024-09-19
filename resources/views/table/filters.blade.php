@@ -25,7 +25,7 @@
                     @if($filter->type === 'select')
                         <select
                             name="filter-{{ $filter->key }}"
-                            class="block focus:ring-indigo-500 focus:border-indigo-500 w-full shadow-sm text-sm border-gray-300 rounded-md"
+                            class="select select-sm border-gray-400 w-full"
                             @change="table.updateQuery('filter[{{ $filter->key }}]', $event.target.value)"
                         >
                             @foreach($filter->options() as $optionKey => $option)
