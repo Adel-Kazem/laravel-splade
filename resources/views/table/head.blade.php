@@ -1,7 +1,8 @@
-<thead class="bg-gray-50">
+<thead class="bg-gray-100">
     <tr>
         @if($hasBulkActions = $table->hasBulkActions())
-            <th width="64" class="px-6 py-3 text-xs">
+            <th width="45" class="px-3 py-2 text-xs">
+{{--            <th width="64" class="px-6 py-2 text-xs">--}}
                 @include('splade::table.select-rows-dropdown')
             </th>
         @endif
@@ -9,7 +10,8 @@
         @foreach($table->columns() as $column)
             <th
                 v-show="table.columnIsVisible(@js($column->key))"
-                class="@if($loop->first && $hasBulkActions) pr-6 @else px-6 @endif py-3 text-left text-xs font-medium tracking-wide text-gray-500 {{ $column->classes }}"
+                class="@if($loop->first && $hasBulkActions) pr-2 @else px-3 @endif py-2 text-left text-xs font-medium tracking-wide text-gray-500 {{ $column->classes }}"
+{{--                class="@if($loop->first && $hasBulkActions) pr-6 @else px-6 @endif py-2 text-left text-xs font-medium tracking-wide text-gray-500 {{ $column->classes }}"--}}
             >
                 @if($column->sortable)
                     <a @click.exact.prevent="table.navigate(@js($sortByUrl = $sortBy($column)))" dusk="sort-{{ $column->key }}" href="{{ $sortByUrl }}">
