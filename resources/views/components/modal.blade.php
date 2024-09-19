@@ -16,7 +16,7 @@
                 'sm:max-w-md md:max-w-lg': modal.maxWidth == 'lg',
                 'sm:max-w-md md:max-w-xl': modal.maxWidth == 'xl',
                 'sm:max-w-md md:max-w-xl lg:max-w-2xl': modal.maxWidth == '2xl',
-                'sm:max-w-md md:max-w-xl lg:max-w-3xl': modal.maxWidth == '3xl',
+                'sm:max-w-md md:max-w-xl lg:max-w-3xl': !modal.maxWidth || modal.maxWidth == '3xl',
                 'sm:max-w-md md:max-w-xl lg:max-w-3xl xl:max-w-4xl': modal.maxWidth == '4xl',
                 'sm:max-w-md md:max-w-xl lg:max-w-3xl xl:max-w-5xl': modal.maxWidth == '5xl',
                 'sm:max-w-md md:max-w-xl lg:max-w-3xl xl:max-w-5xl 2xl:max-w-6xl': modal.maxWidth == '6xl',
