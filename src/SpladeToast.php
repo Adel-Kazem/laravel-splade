@@ -80,25 +80,41 @@ class SpladeToast implements Arrayable, JsonSerializable
         return $this->message($message);
     }
 
-    /**
-     * Setter for the message.
-     *
-     * @return $this
-     */
     public function message(HtmlString|string $message = ''): self
     {
         if ($message instanceof HtmlString && trim($message->toHtml()) === '') {
             $message = '';
         }
 
+        // Directly use the message without escaping it
         if (is_string($message)) {
-            $message = new HtmlString(nl2br(e($message)));
+            $message = new HtmlString($message);
         }
 
         $this->message = $message;
 
         return $this;
     }
+
+    /**
+     * Setter for the message.
+     *
+     * @return $this
+     */
+//    public function message(HtmlString|string $message = ''): self
+//    {
+//        if ($message instanceof HtmlString && trim($message->toHtml()) === '') {
+//            $message = '';
+//        }
+//
+//        if (is_string($message)) {
+//            $message = new HtmlString(nl2br(e($message)));
+//        }
+//
+//        $this->message = $message;
+//
+//        return $this;
+//    }
 
     /**
      * Sets a boolean whether a backdrop should be used.
