@@ -36,6 +36,8 @@ trait HasBulkActions
         string $confirmText = '',
         string $confirmButton = '',
         string $cancelButton = '',
+        string $extraParameters = '',
+
         bool|string $requirePassword = false,
     ): self {
         $key = count($this->bulkActions);
@@ -53,6 +55,8 @@ trait HasBulkActions
             cancelButton: $cancelButton,
             requirePassword: $requirePassword,
         );
+
+        $this->bulkActions[$key]->setExtraParameters($extraParameters);
 
         return $this;
     }
