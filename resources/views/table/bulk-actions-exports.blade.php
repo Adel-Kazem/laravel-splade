@@ -19,9 +19,10 @@
 
             @foreach($table->getBulkActions() as $bulkAction)
                 <button
-                    v-if="table.hasSelectedItems"
-                    class="text-left w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 font-normal"
-                    @click.prevent="table.performBulkAction(
+                        v-if="table.hasSelectedItems"
+                        class="text-left w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 font-normal"
+                        @click.prevent="table.performBulkAction(
+                        @js($bulkAction->getUrl(['wildId' => $bulkAction->extraParameters])),
                         @js($bulkAction->getUrl()),
                         @js($bulkAction->confirm),
                         @js($bulkAction->confirmText),
@@ -29,7 +30,7 @@
                         @js($bulkAction->cancelButton),
                         @js($bulkAction->requirePassword)
                     )"
-                    dusk="action.{{ $bulkAction->getSlug() }}">
+                        dusk="action.{{ $bulkAction->getSlug() }}">
                     {{ $bulkAction->label }}
                 </button>
             @endforeach
@@ -46,10 +47,10 @@
 
             @foreach($table->getExports() as $export)
                 <a
-                    download
-                    class="text-left w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 font-normal"
-                    href="{{ $export->getUrl() }}"
-                    dusk="action.{{ $export->getSlug() }}">
+                        download
+                        class="text-left w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 font-normal"
+                        href="{{ $export->getUrl() }}"
+                        dusk="action.{{ $export->getSlug() }}">
                     {{ $export->label }}
                 </a>
             @endforeach
