@@ -8,14 +8,15 @@
             }"
         >
             @if($hasBulkActions = $table->hasBulkActions())
-                <td width="64" class="text-xs px-6 py-4">
+                <td width="45" class="text-center text-xs px-3 py-2">
+{{--                <td width="64" class="text-xs px-6 py-3">--}}
                     @php $itemPrimaryKey = $table->findPrimaryKey($item) @endphp
 
                     <input
                         @change="(e) => table.setSelectedItem(@js($itemPrimaryKey), e.target.checked)"
                         :checked="table.itemIsSelected(@js($itemPrimaryKey))"
                         :disabled="table.allItemsFromAllPagesAreSelected"
-                        class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 disabled:opacity-50"
+                        class="checkbox checkbox-xs"
                         name="table-row-bulk-action"
                         type="checkbox"
                         value="{{ $itemPrimaryKey }}"
@@ -29,7 +30,8 @@
                         @click="(event) => table.visit(@js($table->rowLinks->get($itemKey)), @js($table->rowLinkType), event)"
                     @endif
                     v-show="table.columnIsVisible(@js($column->key))"
-                    class="whitespace-nowrap text-sm @if($loop->first && $hasBulkActions) pr-6 @else px-6 @endif py-4 @if($column->highlight) text-gray-900 font-medium @else text-gray-500 @endif @if($table->rowLinks->has($itemKey)) cursor-pointer @endif {{ $column->classes }}"
+                    class="whitespace-nowrap text-sm @if($loop->first && $hasBulkActions) pr-2 @else px-3 @endif py-2 @if($column->highlight) text-gray-900 font-medium @else text-black @endif @if($table->rowLinks->has($itemKey)) cursor-pointer @endif {{ $column->classes }}"
+{{--                    class="whitespace-nowrap text-sm @if($loop->first && $hasBulkActions) pr-6 @else px-6 @endif py-3 @if($column->highlight) text-gray-900 font-medium @else text-gray-500 @endif @if($table->rowLinks->has($itemKey)) cursor-pointer @endif {{ $column->classes }}"--}}
                 >
                     <div class="flex flex-row items-center @if($column->alignment == 'right') justify-end @elseif($column->alignment == 'center') justify-center @else justify-start @endif">
                         @isset(${'spladeTableCell' . $column->keyHash()})
