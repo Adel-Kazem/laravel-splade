@@ -1,4 +1,4 @@
-<div class="flex flex-row sm:justify-end mb-3 px-4 sm:px-0 -mr-2 sm:-mr-3">
+<div class="flex flex-row sm:justify-end mb-2 px-4 sm:px-0 -mr-2 sm:-mr-3">
     @if($table->hasExports() || $table->hasBulkActions())
         <div class="order-1 mr-2 sm:mr-3" v-if="table.hasSelectedItems || @js($table->hasExports())">
             @include('splade::table.bulk-actions-exports')
@@ -20,7 +20,10 @@
     <button
         v-show="@js($canResetTable()) || table.columnsAreToggled || table.hasForcedVisibleSearchInputs"
         type="button"
-        class="order-6 sm:order-4 ml-auto mr-2 sm:mr-3 bg-white border rounded-md shadow-sm px-2.5 sm:px-4 py-2 inline-flex justify-center text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 border-gray-300"
+        class="flex items-center order-6 sm:order-4 ml-auto mr-2 sm:mr-3 bg-white border rounded-md shadow-sm px-2.5 sm:px-4 inline-flex justify-center text-sm font-medium text-gray-700 input input-sm input-bordered border-gray-300 focus:border-black focus:ring-black"
+{{--        class="input input-sm input-bordered border-gray-300 focus:border-black focus:ring-black"--}}
+
+        {{--        class="order-6 sm:order-4 ml-auto mr-2 sm:mr-3 bg-white border rounded-md shadow-sm px-2.5 sm:px-4 py-2 inline-flex justify-center text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 border-gray-300"--}}
         @click.prevent="table.reset"
         dusk="reset-table"
     >
