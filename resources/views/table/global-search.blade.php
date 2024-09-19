@@ -1,7 +1,7 @@
 <div class="relative">
     <input
-      class="block w-full sm:pl-9 text-sm rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 border-gray-300"
-      placeholder="{{ $table->searchInputs('global')->label }}"
+            class="block w-full sm:pl-9 text-sm input input-sm input-bordered border-gray-300 focus:border-black focus:ring-black"
+            placeholder="{{ $table->searchInputs('global')->label }}"
       value="{{ $table->searchInputs('global')->value }}"
       type="text"
       name="searchInput-global"
