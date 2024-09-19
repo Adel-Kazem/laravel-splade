@@ -1,6 +1,6 @@
 <select
     name="per_page"
-    class="block focus:ring-indigo-500 focus:border-indigo-500 min-w-max shadow-sm text-sm border-gray-300 rounded-md"
+    class="select select-sm border-gray-400"
     @change="table.updateQuery('perPage', $event.target.value)"
   >
     @foreach($table->allPerPageOptions() as $perPage)
