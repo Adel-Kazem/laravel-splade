@@ -49,7 +49,7 @@
                         </svg>
                     @endif
                 </div>
-                <div class="ml-3 break-words">
+                <div class="ml-3 break-words flex-1">
                     <h3
                             @class([
                     'text-sm font-medium',
@@ -63,7 +63,7 @@
                     @if($title && $message)
                         <div
                                 @class([
-                        'mt-2 text-sm',
+                        'text-sm',
                         'text-black' => $isSuccess || $isWarning || $isInfo,
                         'text-white' => $isDanger,
                         ])
@@ -95,7 +95,7 @@
                 </div>
             </div>
             </div>
-            <div id="{{ $uniqueId }}" class="absolute bottom-0 left-0 right-0 h-1 transition-all duration-1000 ease-linear"
+            <div id="{{ $uniqueId }}" class="absolute bottom-0 left-0 right-0 h-1 transition-all duration-1000 ease-linear rounded-b-xl"
                  :class="{
                         'bg-green-600': @json($isSuccess),
                         'bg-yellow-500': @json($isWarning),

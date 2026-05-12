@@ -58,12 +58,17 @@ class BulkAction
         /** @var array */
         $currentQuery = app()->bound('request') ? request()->query() : [];
 
-        $parameters = array_merge($currentQuery, [
+        $base = [
             'table'  => base64_encode($this->tableClass),
             'action' => base64_encode($this->key),
             'slug'   => $this->getSlug(),
-            'bexParameters'   => $extraParameters['wildId'],
-        ]); // Merge extra parameters into the URL parameters
+        ];
+
+        if (isset($extraParameters['wildId'])) {
+            $base['bexParameters'] = $extraParameters['wildId'];
+        }
+
+        $parameters = array_merge($currentQuery, $base);
 
         return URL::signedRoute($route->getName(), $parameters);
     }
