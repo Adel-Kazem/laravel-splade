@@ -95,4 +95,43 @@ return [
         'choices_select_macro'      => 'choicesSelect',
         'choices_remove_item_macro' => 'choicesRemoveItem',
     ],
+
+    /**
+     * In-app navigation history ("back" button).
+     *
+     * Splade keeps a server-side stack of the real pages a user visits so the
+     * <x-splade-back-link> component (route: splade.navBack) can return them to
+     * the previous page. Modal/slideover loads and partial reloads are overlays,
+     * not pages, and are never recorded.
+     */
+    'navigation' => [
+        // Master switch. When false, no tracking happens and the back route
+        // is not registered.
+        'history' => true,
+
+        // URI for the back endpoint, registered with the web + splade middleware.
+        'route' => '/_splade/nav-back',
+
+        // Session key holding the history stack.
+        'session_key' => 'splade_nav_history',
+
+        // Where to send the user when the stack is empty.
+        'fallback' => '/',
+
+        // Max entries kept on the stack (oldest are trimmed).
+        'max_depth' => 30,
+
+        // Routes never recorded as "back" targets. Each entry is matched against
+        // BOTH the route name (Route::is wildcards, e.g. 'password.*') AND the
+        // URI path (glob, e.g. 'api/*'), so either form works. Splade's own
+        // internal endpoints are excluded via '_splade/*'.
+        'except' => [
+            '_splade/*',
+            'login',
+            'logout',
+            'register',
+            'password.*',
+            'verification.*',
+        ],
+    ],
 ];

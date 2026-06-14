@@ -36,6 +36,7 @@ use ProtoneMedia\Splade\Http\BladeDirectives;
 use ProtoneMedia\Splade\Http\ConfirmPasswordController;
 use ProtoneMedia\Splade\Http\EventRedirectController;
 use ProtoneMedia\Splade\Http\FileUploadController;
+use ProtoneMedia\Splade\Http\NavBackController;
 use ProtoneMedia\Splade\Http\TableBulkActionController;
 use ProtoneMedia\Splade\Http\TableExportController;
 
@@ -104,6 +105,7 @@ class ServiceProvider extends BaseServiceProvider
         $this->registerResponseMacro();
         $this->registerRequestMacros();
         $this->registerRouteForEventRedirect();
+        $this->registerRouteForNavigationBack();
         $this->registerMacroForBridgeComponent();
         $this->registerMacroForPasswordConfirmation();
         $this->registerMacroForFileUploads();
@@ -244,6 +246,7 @@ class ServiceProvider extends BaseServiceProvider
         );
 
         Blade::components([
+            Components\BackLink::class,
             Components\Button::class,
             Components\ButtonWithDropdown::class,
             Components\Cell::class,
@@ -444,6 +447,24 @@ class ServiceProvider extends BaseServiceProvider
         Route::get(config('splade.event_redirect_route'), EventRedirectController::class)
             ->name('splade.eventRedirect')
             ->middleware(ValidateSignature::class);
+    }
+
+    /**
+     * Registers the route that steps the user back through the navigation
+     * history recorded by the SpladeMiddleware. Needs web (session) + splade
+     * so the redirect is handled as a soft SPA navigation.
+     *
+     * @return void
+     */
+    private function registerRouteForNavigationBack()
+    {
+        if (!config('splade.navigation.history', true)) {
+            return;
+        }
+
+        Route::get(config('splade.navigation.route', '/_splade/nav-back'), NavBackController::class)
+            ->name('splade.navBack')
+            ->middleware(['web', 'splade']);
     }
 
     /**

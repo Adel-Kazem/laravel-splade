@@ -101,10 +101,72 @@ class SpladeMiddleware
             $session->put(static::FLASH_TOASTS, $this->splade->getToasts());
         }
 
+        // Record this page in the server-side navigation history so the
+        // <x-splade-back-link> can step the user back to real pages only.
+        $this->recordNavigationHistory($request, $response, $session);
+
         // A Splade request is a request made by the Vue app, so not the initial first request.
         return $this->splade->isSpladeRequest()
             ? $this->handleSpladeRequest($request, $response, $spladeData)
             : $this->handleRegularRequest($request, $response, $spladeData);
+    }
+
+    /**
+     * Maintains a server-side stack of the real pages the user visits so an
+     * in-app "back" control (NavBackController) can step backwards. Overlays
+     * (modal/slideover), partial reloads (lazy/rehydrate), redirects, errors,
+     * non-GET requests and configured exceptions are never recorded.
+     *
+     * @return void
+     */
+    private function recordNavigationHistory(Request $request, Response $response, Session $session)
+    {
+        if (!config('splade.navigation.history', true)) {
+            return;
+        }
+
+        if (!$request->isMethod('GET')) {
+            return;
+        }
+
+        // Overlays and partial reloads are not navigations.
+        if ($this->splade->isModalRequest()
+            || $this->splade->isLazyRequest()
+            || $this->splade->isRehydrateRequest()) {
+            return;
+        }
+
+        // Only remember successful page responses — never redirects or errors.
+        if ($response->isRedirect() || !$response->isSuccessful()) {
+            return;
+        }
+
+        // Config-driven ignore list: each entry is matched as a route name
+        // (Route::is wildcards) AND a URI glob, so 'password.*' and 'api/*'
+        // both work. Splade's own endpoints are excluded via '_splade/*'.
+        foreach ((array) config('splade.navigation.except', []) as $pattern) {
+            if ($pattern && ($request->routeIs($pattern) || $request->is($pattern))) {
+                return;
+            }
+        }
+
+        $key     = config('splade.navigation.session_key', 'splade_nav_history');
+        $current = $request->fullUrl();
+        $stack   = $session->get($key, []);
+
+        // De-dupe consecutive identical entries.
+        if (end($stack) === $current) {
+            return;
+        }
+
+        $stack[] = $current;
+
+        $max = (int) config('splade.navigation.max_depth', 30);
+        if ($max > 0 && count($stack) > $max) {
+            $stack = array_slice($stack, -$max);
+        }
+
+        $session->put($key, $stack);
     }
 
     /**

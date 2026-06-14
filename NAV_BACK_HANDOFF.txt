@@ -1,0 +1,150 @@
+================================================================================
+SPLADE FORK — BUILT-IN NAVIGATION HISTORY / "BACK" BUTTON
+Handoff for the next assistant / maintainer
+Author: Claude (with Adel Kazem)   Date: 2026-06-14
+Fork: github.com/Adel-Kazem/laravel-splade   Branch: main (composer "dev-main")
+================================================================================
+
+WHY THIS EXISTS
+--------------------------------------------------------------------------------
+NovaStores (and other apps on this fork) need an in-app "back" button. The
+browser's native back is unreliable in a Splade SPA, and — critically — a
+naive history tracker records MODAL/SLIDEOVER routes as if they were pages.
+When the user later hits "back", it would redirect to the modal's route as a
+BARE FULL PAGE (no layout, no back button), because modal views are wrapped in
+<x-splade-modal> and usually have no layout. Two bad symptoms, one root cause:
+modal content loads were being treated as navigations.
+
+THE FIX: maintain a SERVER-SIDE stack of only the REAL pages a user visits, and
+exclude overlays/partials. A <x-splade-back-link> component + a back route pop
+that stack. This is now a DEFAULT, config-driven package feature.
+
+This logic was first prototyped app-side in NovaStores (a standalone
+App\Http\Middleware\TrackNavigationHistory + App\Http\Controllers\NavBackController
++ a local config/splade.php + a local component). That prototype is being
+RETIRED in favor of this package implementation. See "NOVASTORES CLEANUP" below.
+
+================================================================================
+WHAT CHANGED IN THIS FORK (all on branch `main`)
+================================================================================
+
+1) src/Http/SpladeMiddleware.php   [CORE]
+   - In handle(), just before the final
+        return $this->splade->isSpladeRequest() ? ... : ...;
+     added:
+        $this->recordNavigationHistory($request, $response, $session);
+   - New private method recordNavigationHistory(Request, Response, Session):
+       * skips when config('splade.navigation.history') is false
+       * skips non-GET
+       * skips overlays/partials via the SpladeCore helpers:
+         isModalRequest() || isLazyRequest() || isRehydrateRequest()
+       * skips redirects and non-2xx responses
+       * skips any route in config('splade.navigation.except'), where each
+         pattern is matched as BOTH a route name (routeIs, wildcards) AND a URI
+         glob (is) — so 'password.*' and 'api/*' both work
+       * de-dupes consecutive identical URLs
+       * pushes $request->fullUrl() onto session key
+         config('splade.navigation.session_key')
+       * trims to config('splade.navigation.max_depth')
+   - No new imports needed: Session, Request, Response were already imported.
+
+2) src/Http/NavBackController.php   [NEW]
+   - __invoke: reads the session stack, pops trailing entries equal to
+     url()->previous(), pops the next entry as the target (or
+     config('splade.navigation.fallback')), writes the stack back, redirects.
+   - Splade turns the redirect into a soft SPA navigation automatically.
+
+3) src/Components/BackLink.php   [NEW]
+   - Class component -> tag <x-splade-back-link> (prefix from
+     config('splade.blade.component_prefix') = 'splade').
+   - Optional :href prop; otherwise resolves route('splade.navBack') if the
+     route exists, else '#'. Renders view splade::components.back-link.
+
+4) resources/views/components/back-link.blade.php   [NEW]
+   - Wraps <x-splade-link :href="$target">, merges passed attributes (default
+     title="Go back"), renders the slot or a default back-arrow SVG.
+
+5) config/splade.php   [EDIT]
+   - Added a 'navigation' block (after 'dusk'):
+        'history'     => true,
+        'route'       => '/_splade/nav-back',
+        'session_key' => 'splade_nav_history',
+        'fallback'    => '/',
+        'max_depth'   => 30,
+        'except'      => ['_splade/*','login','logout','register',
+                          'password.*','verification.*'],
+
+6) src/ServiceProvider.php   [EDIT]
+   - use ProtoneMedia\Splade\Http\NavBackController;
+   - Registered Components\BackLink::class at the top of the Blade::components([]) list.
+   - boot(): added $this->registerRouteForNavigationBack(); right after
+     $this->registerRouteForEventRedirect();
+   - New method registerRouteForNavigationBack(): returns early if history is
+     off; otherwise
+        Route::get(config('splade.navigation.route'), NavBackController::class)
+            ->name('splade.navBack')
+            ->middleware(['web','splade']);
+     NOTE: 'web' is required for session; 'splade' so the redirect is a soft nav.
+     (Unlike the event-redirect route, this one needs session, hence 'web'.)
+
+================================================================================
+PUBLIC API (what apps use after composer update)
+================================================================================
+- Route name:  splade.navBack   (URI: /_splade/nav-back by default)
+- Component:   <x-splade-back-link class="..."> ...optional icon/label... </x-splade-back-link>
+               <x-splade-back-link :href="route('something')" />  (override target)
+- Config:      config/splade.php -> 'navigation' (publish to customize 'except',
+               'max_depth', disable via 'history' => false, etc.)
+- Everything is ON by default and self-registers; zero setup in a new app.
+
+================================================================================
+HOW TO SHIP IT (fork -> consuming app)
+================================================================================
+1) Commit + push this branch:
+     cd ~/forks/laravel-splade
+     git add -A && git commit -m "feat: built-in navigation history + back link"
+     git push origin main
+2) In the consuming app's composer.json, bump the pinned hash:
+     "protonemedia/laravel-splade": "dev-main#<NEW_HASH> as 1.4.21"
+   (ROLLBACK POINT before this work: 6f8a998)
+3) composer update protonemedia/laravel-splade
+4) php artisan config:clear   (NEVER route:cache in NovaStores — it 404s all
+   host-routed storefront routes; config:clear/config:cache are fine)
+
+================================================================================
+NOVASTORES CLEANUP (do AFTER composer update succeeds & is verified)
+================================================================================
+The app-side prototype must be removed so it doesn't double-track or shadow the
+package versions:
+  - Delete  app/Http/Middleware/TrackNavigationHistory.php
+  - Remove its line from app/Http/Kernel.php ('web' group)
+  - Delete  app/Http/Controllers/NavBackController.php
+  - Remove the '/nav/back' route (name 'nav.back') from routes/web.php
+  - Delete  resources/views/components/splade-back-link.blade.php
+            (package now provides <x-splade-back-link>)
+  - Delete  config/splade.php  (the partial app override; package ships the
+            'navigation' defaults — re-publish only if you want to customize)
+  - layout.blade.php already uses <x-splade-back-link>; the package component
+    resolves route('splade.navBack'), so NO template change is needed. The old
+    app route was 'nav.back'; the package route is 'splade.navBack'. The
+    component handles this difference internally.
+Then: php artisan config:clear && php artisan view:clear
+
+================================================================================
+VERIFICATION CHECKLIST
+================================================================================
+- php artisan route:list | grep navBack   -> shows /_splade/nav-back
+- config('splade.navigation.history') === true
+- Manual: Dashboard -> open a modal (e.g. a <Link modal> route) -> navigate to
+  another page -> click back. EXPECT: lands on the real previous page WITH the
+  layout/back button. The modal route must NOT appear as a full page.
+- Open a lazy/rehydrate page; confirm those partial loads do not pollute history.
+
+================================================================================
+SAFETY / ROLLBACK
+================================================================================
+- Pushing to the fork does NOT affect any app until its composer.json hash is
+  bumped. The only risky step is `composer update`.
+- To roll back instantly: set the app's composer.json back to
+  "dev-main#6f8a998 as 1.4.21" and run composer update.
+================================================================================
