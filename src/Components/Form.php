@@ -56,7 +56,7 @@ class Form extends Component
         $unguarded = null,
         public bool $scrollOnError = true,
         public array|bool|string $submitOnChange = false,
-        public bool $preserveScroll = false,
+        public bool $preserveScroll = true,
         public bool $background = false,
         public int $debounce = 0,
         public string $acceptHeader = 'text/html, application/xhtml+xml',
