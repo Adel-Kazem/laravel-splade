@@ -19,84 +19,81 @@
                 $autoDismissMs = isset($autoDismiss) ? $autoDismiss * 1000 : null; // Convert to milliseconds if set, otherwise null
             @endphp
 
-
+            {{-- Content-sized toast. The only non-standard utility is the mobile width cap
+                 max-w-[calc(100vw-2rem)] (viewport minus the wrapper's 1rem gutter each side)
+                 which guarantees it can never exceed the screen on a phone. On >=sm it caps at
+                 max-w-sm. Everything else is standard Tailwind. --}}
             <div
                     @class([
-            // Width is content-sized (compact for short messages) but HARD-CAPPED so it can
-            // never exceed the screen: on phones max-width = viewport minus the wrapper's
-            // gutter; on >=sm it gets a comfortable min/max. No fixed full-bleed width, so a
-            // one-line toast stays small on mobile instead of stretching edge to edge.
-            'p-3 sm:p-4 pointer-events-auto shadow-2xl relative border rounded-2xl transition-all duration-500 bg-white dark:bg-stone-900',
-            'w-auto max-w-[calc(100vw-2rem)] sm:min-w-[300px] sm:max-w-md',
+            'relative w-auto max-w-[calc(100vw-2rem)] sm:max-w-sm p-4 rounded-2xl border shadow-2xl bg-white dark:bg-stone-900 pointer-events-auto',
             'border-indigo-500' => $isSuccess,
             'border-yellow-500' => $isWarning,
             'border-stone-200 dark:border-stone-800' => $isInfo,
             'border-red-600' => $isDanger,
             ])
             >
-                <div class="flex items-start gap-3 sm:gap-4">
-                    <div class="flex-shrink-0 mt-0.5">
+                <div class="flex items-start gap-3">
+                    <div class="flex-shrink-0">
                         @if($isSuccess)
-                            <div class="w-8 h-8 rounded-full bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+                            <div class="w-8 h-8 rounded-full flex items-center justify-center bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400">
                                 <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                                 </svg>
                             </div>
                         @elseif($isWarning)
-                            <div class="w-8 h-8 rounded-full bg-yellow-50 dark:bg-yellow-500/10 flex items-center justify-center text-yellow-600 dark:text-yellow-400">
+                            <div class="w-8 h-8 rounded-full flex items-center justify-center bg-yellow-50 text-yellow-600 dark:bg-yellow-500/10 dark:text-yellow-400">
                                 <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
                                 </svg>
                             </div>
                         @elseif($isDanger)
-                            <div class="w-8 h-8 rounded-full bg-red-50 dark:bg-red-500/10 flex items-center justify-center text-red-600 dark:text-red-400">
+                            <div class="w-8 h-8 rounded-full flex items-center justify-center bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-400">
                                 <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
                                 </svg>
                             </div>
                         @elseif($isInfo)
-                            <div class="w-8 h-8 rounded-full bg-stone-50 dark:bg-stone-800 flex items-center justify-center text-stone-600 dark:text-stone-400">
+                            <div class="w-8 h-8 rounded-full flex items-center justify-center bg-stone-100 text-stone-600 dark:bg-stone-800 dark:text-stone-400">
                                 <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
                                 </svg>
                             </div>
                         @endif
                     </div>
-                    <div class="break-words flex-1 min-w-0">
-                        <h3 class="text-[11px] font-bold uppercase tracking-widest text-stone-900 dark:text-stone-100">
+
+                    <div class="flex-1 min-w-0 break-words">
+                        <h3 class="text-sm font-semibold text-stone-900 dark:text-stone-100">
                             {!! nl2br(e($title ?: $message)) !!}
                         </h3>
 
                         @if($title && $message)
-                            <div class="text-[10px] font-medium text-stone-500 dark:text-stone-400 mt-1 uppercase tracking-wide">
-                                <p>{!! nl2br(e($message)) !!}</p>
-                            </div>
+                            <p class="mt-0.5 text-xs text-stone-500 dark:text-stone-400">
+                                {!! nl2br(e($message)) !!}
+                            </p>
                         @endif
                     </div>
 
-                    <div class="flex-shrink-0">
-                        <button
-                                id="close-button-{{ $uniqueId }}"
-                                type="button"
-                                @click.prevent="toast.setShow(false)"
-                                class="text-stone-400 hover:text-indigo-500 transition-colors p-1"
-                        >
-                            <span class="sr-only">Dismiss Toast</span>
-                            <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-                            </svg>
-                        </button>
-                    </div>
+                    <button
+                            id="close-button-{{ $uniqueId }}"
+                            type="button"
+                            @click.prevent="toast.setShow(false)"
+                            class="flex-shrink-0 p-1 text-stone-400 hover:text-stone-600 dark:hover:text-stone-200"
+                    >
+                        <span class="sr-only">Dismiss Toast</span>
+                        <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
                 </div>
-                {{-- Progress bar wrapped in an overflow-hidden, rounded container so the
-                     square countdown bar is clipped to the card's rounded bottom corners
-                     (it used to poke past them and look like a line exceeding the box). --}}
-                <div class="absolute bottom-0 left-0 right-0 h-0.5 px-3 sm:px-4 overflow-hidden rounded-b-2xl pointer-events-none">
-                    <div id="{{ $uniqueId }}" class="h-full transition-all duration-1000 ease-linear opacity-50"
+
+                {{-- Progress bar clipped to the card's rounded bottom corners (overflow-hidden +
+                     rounded-b-2xl), so the square countdown bar never pokes past the box. --}}
+                <div class="absolute bottom-0 left-0 right-0 px-4 h-0.5 overflow-hidden rounded-b-2xl pointer-events-none">
+                    <div id="{{ $uniqueId }}" class="h-full opacity-60"
                          :class="{
                             'bg-indigo-600': @json($isSuccess),
                             'bg-yellow-500': @json($isWarning),
-                            'bg-red-700': @json($isDanger),
+                            'bg-red-600': @json($isDanger),
                             'bg-stone-400': @json($isInfo),
                         }"
                     ></div>
@@ -105,7 +102,6 @@
 
             <x-splade-script>
                 (function() {
-                    const toastId = '{{ $uniqueId }}';
                     const startTime = {{ $uniqueTimestamp }};
                     const duration = {{ $autoDismissMs ?? 'null' }}; // Duration in milliseconds, or null if not set
 
@@ -126,20 +122,15 @@
 
                             if (timeLeft > 0) {
                                 requestAnimationFrame(updateCountdown);
-                            } else {
-                                if (closeButton) {
-                                    closeButton.click();
-                                }
+                            } else if (closeButton) {
+                                closeButton.click();
                             }
                         }
 
-                        // Start the countdown immediately
                         updateCountdown();
-                    } else {
-                        // If no auto-dismiss, hide the countdown border
-                        if (borderElement) {
-                            borderElement.style.display = 'none';
-                        }
+                    } else if (borderElement) {
+                        // No auto-dismiss: hide the countdown bar
+                        borderElement.style.display = 'none';
                     }
                 })();
             </x-splade-script>
