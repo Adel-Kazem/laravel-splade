@@ -22,11 +22,12 @@
 
             <div
                     @class([
-            // Mobile-first width: fills the viewport (minus the wrapper's gutter) on phones,
-            // then becomes content-sized with sane min/max on >=sm screens. This keeps the
-            // toast from overflowing its grid column on narrow devices.
+            // Width is content-sized (compact for short messages) but HARD-CAPPED so it can
+            // never exceed the screen: on phones max-width = viewport minus the wrapper's
+            // gutter; on >=sm it gets a comfortable min/max. No fixed full-bleed width, so a
+            // one-line toast stays small on mobile instead of stretching edge to edge.
             'p-3 sm:p-4 pointer-events-auto shadow-2xl relative border rounded-2xl transition-all duration-500 bg-white dark:bg-stone-900',
-            'w-[calc(100vw-2rem)] max-w-md sm:w-auto sm:min-w-[320px]',
+            'w-auto max-w-[calc(100vw-2rem)] sm:min-w-[300px] sm:max-w-md',
             'border-indigo-500' => $isSuccess,
             'border-yellow-500' => $isWarning,
             'border-stone-200 dark:border-stone-800' => $isInfo,
