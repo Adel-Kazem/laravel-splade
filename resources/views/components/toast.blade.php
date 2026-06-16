@@ -22,10 +22,13 @@
             {{-- Content-sized toast. The only non-standard utility is the mobile width cap
                  max-w-[calc(100vw-2rem)] (viewport minus the wrapper's 1rem gutter each side)
                  which guarantees it can never exceed the screen on a phone. On >=sm it caps at
-                 max-w-sm. Everything else is standard Tailwind. --}}
+                 max-w-sm. A min-w-[15rem] floor keeps short toasts (e.g. a one-line success
+                 message) from collapsing narrow and wrapping into a tall, skinny box. The floor
+                 (240px) stays under the cap on any real phone (>=320px). Everything else is
+                 standard Tailwind. --}}
             <div
                     @class([
-            'relative w-auto max-w-[calc(100vw-2rem)] sm:max-w-sm p-4 rounded-2xl border shadow-2xl bg-white dark:bg-stone-900 pointer-events-auto',
+            'relative w-auto min-w-[15rem] max-w-[calc(100vw-2rem)] sm:max-w-sm p-4 rounded-2xl border shadow-2xl bg-white dark:bg-stone-900 pointer-events-auto',
             'border-indigo-500' => $isSuccess,
             'border-yellow-500' => $isWarning,
             'border-stone-200 dark:border-stone-800' => $isInfo,
