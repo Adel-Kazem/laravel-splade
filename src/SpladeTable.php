@@ -51,6 +51,8 @@ class SpladeTable
 
     protected bool $resourceLoaded = false;
 
+    protected bool $mirrorSelection = false;
+
     public static string $defaultPaginationScroll = 'top';
 
     protected static bool $defaultResetButton = true;
@@ -307,6 +309,27 @@ class SpladeTable
     public function hasPerPageQuery(): bool
     {
         return $this->query('perPage') !== null;
+    }
+
+    /**
+     * Mirror the current row selection into the wrapping <x-splade-data> store
+     * (data.bulkSelected / data.bulkAllPages) so elements rendered outside the
+     * table component's scope (e.g. a sibling modal form) can read which rows
+     * are selected. Opt-in per table; styling is unaffected.
+     */
+    public function mirrorSelection(bool $value = true): self
+    {
+        $this->mirrorSelection = $value;
+
+        return $this;
+    }
+
+    /**
+     * Whether this table mirrors its selection into the wrapping data store.
+     */
+    public function mirrorsSelection(): bool
+    {
+        return $this->mirrorSelection;
     }
 
     /**

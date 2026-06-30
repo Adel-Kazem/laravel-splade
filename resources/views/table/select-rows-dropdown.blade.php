@@ -11,7 +11,11 @@
         <div class="flex flex-col">
             <button
                 class="text-left w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 font-normal"
+                @if($bulkMirror ?? false)
+                @click="() => { const keys = @js($table->getPrimaryKeys()); table.setSelectedItems(keys); data.bulkAllPages = false; data.bulkSelected = keys; }"
+                @else
                 @click="table.setSelectedItems(@js($table->getPrimaryKeys()))"
+                @endif
                 dusk="select-all-on-this-page">
                 {{ __('Select all on this page') }} ({{ $table->totalOnThisPage() }})
             </button>
@@ -19,7 +23,11 @@
             @if($showPaginator())
                 <button
                     class="text-left w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 font-normal"
+                    @if($bulkMirror ?? false)
+                    @click="() => { table.setSelectedItems(['*']); data.bulkAllPages = true; data.bulkSelected = ['*']; }"
+                    @else
                     @click="table.setSelectedItems(['*'])"
+                    @endif
                     dusk="select-all-results">
                     {{ __('Select all results') }} ({{ $table->totalOnAllPages() }})
                 </button>
@@ -28,7 +36,11 @@
             <button
                 v-if="table.hasSelectedItems"
                 class="text-left w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 font-normal"
+                @if($bulkMirror ?? false)
+                @click="() => { table.setSelectedItems([]); data.bulkAllPages = false; data.bulkSelected = []; }"
+                @else
                 @click="table.setSelectedItems([])"
+                @endif
                 dusk="select-none">
                 {{ __('Clear selection') }}
             </button>

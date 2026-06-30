@@ -152,10 +152,13 @@ class Table extends Component
      */
     public function render()
     {
+        $table = tap($this->for)->beforeRender();
+
         return view('splade::table.table', [
-            'table'          => tap($this->for)->beforeRender(),
+            'table'          => $table,
             'wrapperName'    => SpladeComponent::normalize('table-wrapper'),
             'paginationView' => $this->isLengthAware() ? 'splade::table.pagination' : 'splade::table.simple-pagination',
+            'bulkMirror'     => method_exists($table, 'mirrorsSelection') ? $table->mirrorsSelection() : false,
         ]);
     }
 }

@@ -13,7 +13,11 @@
                     @php $itemPrimaryKey = $table->findPrimaryKey($item) @endphp
 
                     <input
+                        @if($bulkMirror ?? false)
+                        @change="(e) => { table.setSelectedItem(@js($itemPrimaryKey), e.target.checked); const id = @js($itemPrimaryKey); data.bulkAllPages = false; data.bulkSelected = e.target.checked ? Array.from(new Set([...data.bulkSelected, id])) : data.bulkSelected.filter(x => x !== id); }"
+                        @else
                         @change="(e) => table.setSelectedItem(@js($itemPrimaryKey), e.target.checked)"
+                        @endif
                         :checked="table.itemIsSelected(@js($itemPrimaryKey))"
                         :disabled="table.allItemsFromAllPagesAreSelected"
                         class="checkbox checkbox-xs"
