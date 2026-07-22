@@ -258,11 +258,13 @@ class SpladeMiddleware
     /**
      * Grabs the component from the rendered content and returns it.
      */
-    public static function extractComponent(string $content, string $component, int $componentKey): string
+    public static function extractComponent(string $content, string $component, int|string $componentKey): string
     {
         $component = strtoupper($component);
 
-        preg_match_all('/START-SPLADE-' . $component . '-(\w+)-->/', $content, $matches);
+        // [\w-]+ (not \w+): custom Rehydrate names may contain hyphens, e.g.
+        // "recording-card-123". Backtracking keeps the trailing "-->" intact.
+        preg_match_all('/START-SPLADE-' . $component . '-([\w-]+)-->/', $content, $matches);
 
         return (string) collect($matches[1] ?? [])
             ->mapWithKeys(function (string $name) use ($content, $component) {

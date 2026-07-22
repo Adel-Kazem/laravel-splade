@@ -490,11 +490,14 @@ class SpladeCore
     }
 
     /**
-     * Retrieves the Rehydrate Component key from the request header.
+     * Retrieves the Rehydrate Component key from the request header. Keys are
+     * strings: either an auto-assigned positional counter ("0", "1", ...) or a
+     * custom name given via <x-splade-rehydrate name="...">, which lets a
+     * dedicated lightweight endpoint answer for a single named section.
      */
-    public function getRehydrateComponentKey(): int
+    public function getRehydrateComponentKey(): string
     {
-        return (int) $this->request()->header(static::HEADER_REHYDRATE);
+        return (string) $this->request()->header(static::HEADER_REHYDRATE);
     }
 
     /**
