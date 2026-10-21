@@ -97,7 +97,10 @@ class UpNavigator
             return;
         }
 
-        $stack   = static::seedFromReferer($request, static::stack($session, $tab));
+        $stack = static::stack($session, $tab);
+        if ($session->pull(static::sessionKey() . '_skip') !== $tab) {
+            $stack = static::seedFromReferer($request, $stack);
+        }
         $current = $request->fullUrl();
 
         if (end($stack) === $current) {
@@ -281,6 +284,8 @@ class UpNavigator
 
         if ($tab) {
             static::putStack($request->session(), $tab, $stack);
+            // The redirected request still carries the page being left as Referer: do not re-seed it.
+            $request->session()->put(static::sessionKey() . '_skip', $tab);
         }
 
         return $target;
