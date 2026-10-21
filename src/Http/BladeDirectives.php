@@ -18,6 +18,7 @@ class BladeDirectives
         Blade::directive('splade', [$this, 'splade']);
         Blade::directive('spladeHead', [$this, 'spladeHead']);
         Blade::directive('preserveScroll', [$this, 'preserveScroll']);
+        Blade::directive('spladeNavTab', [$this, 'spladeNavTab']);
 
         $this->registerSEODirectives();
         $this->registerTableCellDirective();
@@ -45,6 +46,19 @@ class BladeDirectives
     public function spladeHead(): string
     {
         return '{{ app(\'laravel-splade-seo\')->renderHead() }}';
+    }
+
+    /**
+     * Inline script (put it in <head>, before the app bundle) that gives this
+     * browser tab a stable id (sessionStorage) and sends it as X-Splade-Tab on
+     * every same-origin XHR, so the header "Up" arrow keeps history PER TAB.
+     * No JS rebuild needed. See ProtoneMedia\Splade\Navigation\UpNavigator.
+     */
+    public function spladeNavTab(): string
+    {
+        return <<<'HTML'
+<script>(function(){var k="splade_tab_id",id;function g(){return(window.crypto&&crypto.randomUUID)?crypto.randomUUID():"t"+Date.now().toString(36)+Math.random().toString(36).slice(2,10)}try{id=sessionStorage.getItem(k);if(!id){id=g();sessionStorage.setItem(k,id)}}catch(e){id=g()}window.spladeTabId=id;var P=XMLHttpRequest.prototype,o=P.open,s=P.send;P.open=function(m,u){try{this.__spladeSame=new URL(u,location.href).origin===location.origin}catch(e){this.__spladeSame=false}return o.apply(this,arguments)};P.send=function(){if(this.__spladeSame){try{this.setRequestHeader("X-Splade-Tab",id)}catch(e){}}return s.apply(this,arguments)}})();</script>
+HTML;
     }
 
     /**

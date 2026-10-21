@@ -121,6 +121,17 @@ return [
         // Max entries kept on the stack (oldest are trimmed).
         'max_depth' => 30,
 
+        // Header "Up" arrow (<x-splade-up-link>, route splade.navUp). Deep page ->
+        // nearest real parent URL; main page -> last different section this tab
+        // visited; pops history (no ping-pong). Per-tab via @spladeNavTab in <head>.
+        // The plain back (<x-splade-back-link>, splade.navBack) is unchanged.
+        'up_route'          => '/_splade/nav-up',
+        'up_session_key'    => 'splade_nav_tabs',
+        'up_fallback'       => '/',          // home: no Up arrow is shown there
+        'up_fallback_label' => 'Dashboard',
+        'up_parents'        => [],           // optional: 'collections/*' => 'recordings'
+        'max_tabs'          => 12,
+
         // Routes never recorded as "back" targets. Each entry is matched against
         // BOTH the route name (Route::is wildcards, e.g. 'password.*') AND the
         // URI path (glob, e.g. 'api/*'), so either form works. Splade's own

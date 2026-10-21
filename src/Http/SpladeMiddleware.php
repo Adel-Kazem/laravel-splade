@@ -150,6 +150,9 @@ class SpladeMiddleware
             }
         }
 
+        // Per-tab history for the header "Up" arrow (X-Splade-Tab header).
+        \ProtoneMedia\Splade\Navigation\UpNavigator::record($request, $session);
+
         $key     = config('splade.navigation.session_key', 'splade_nav_history');
         $current = $request->fullUrl();
         $stack   = $session->get($key, []);

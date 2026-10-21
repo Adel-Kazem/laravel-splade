@@ -247,6 +247,7 @@ class ServiceProvider extends BaseServiceProvider
 
         Blade::components([
             Components\BackLink::class,
+            Components\UpLink::class,
             Components\Button::class,
             Components\ButtonWithDropdown::class,
             Components\Cell::class,
@@ -464,6 +465,11 @@ class ServiceProvider extends BaseServiceProvider
 
         Route::get(config('splade.navigation.route', '/_splade/nav-back'), NavBackController::class)
             ->name('splade.navBack')
+            ->middleware(['web', 'splade']);
+
+        // Header "Up" arrow: smart parent / last different place, per tab.
+        Route::get(config('splade.navigation.up_route', '/_splade/nav-up'), Http\NavUpController::class)
+            ->name('splade.navUp')
             ->middleware(['web', 'splade']);
     }
 
